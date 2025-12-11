@@ -1,0 +1,77 @@
+<main>
+  <section class="hero">
+    <div class="container">
+      <div class="section-heading" style="margin-bottom: 2rem;">
+        <div class="section-title">
+          {% if collection %}
+            {{ collection.title }}
+          {% else %}
+            Collection
+          {% endif %}
+        </div>
+        <p class="section-subtitle">
+          Browse curated OpusVenustas pieces. Prices shown below are in INR.
+        </p>
+      </div>
+
+      {% if collection %}
+        {% if collection.description != blank %}
+          <div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 1.6rem;">
+            {{ collection.description }}
+          </div>
+        {% endif %}
+
+        {% if collection.products_count > 0 %}
+          <div class="product-grid">
+            {% for product in collection.products %}
+              <article class="product-card">
+                <div class="product-label">
+                  {% if product.compare_at_price_max > product.price %}
+                    Offer
+                  {% else %}
+                    New
+                  {% endif %}
+                </div>
+                <a class="product-image" href="{{ product.url }}">
+                  {% if product.featured_image %}
+                    {{ product.featured_image | image_url: width: 700 | image_tag: alt: product.title }}
+                  {% endif %}
+                </a>
+                <div class="product-info">
+                  <a href="{{ product.url }}" class="product-name">{{ product.title }}</a>
+                  {% if product.description != blank %}
+                    <div class="product-meta">
+                      {{ product.description | strip_html | truncate: 90 }}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="product-bottom">
+                  <div class="product-price">
+                    <span class="product-price-main">{{ product.price | money }}</span>
+                    {% if product.compare_at_price_max > product.price %}
+                      <span class="product-price-note">MRP {{ product.compare_at_price_max | money }}</span>
+                    {% else %}
+                      <span class="product-price-note">Inclusive of all taxes</span>
+                    {% endif %}
+                  </div>
+                  {% form 'product', product %}
+                    <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+                    <button type="submit" class="product-btn">
+                      Add to bag
+                    </button>
+                  {% endform %}
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p style="color: var(--muted); font-size: 0.9rem;">
+            No products in this collection yet. Add products in Shopify admin and assign them to this collection.
+          </p>
+        {% endif %}
+      {% else %}
+        <p style="color: var(--muted); font-size: 0.9rem;">Collection not found.</p>
+      {% endif %}
+    </div>
+  </section>
+</main>
