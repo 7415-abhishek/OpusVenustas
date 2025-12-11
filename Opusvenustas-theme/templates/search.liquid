@@ -1,0 +1,75 @@
+<main>
+  <section class="hero">
+    <div class="container">
+      <div class="section-heading" style="margin-bottom: 1.5rem;">
+        <div class="section-title">Search</div>
+        <p class="section-subtitle">
+          Find OpusVenustas pieces by name, style, or category. Results below are priced in INR.
+        </p>
+      </div>
+
+      <form action="/search" method="get" role="search" style="margin-bottom: 1.5rem;">
+        <label for="SearchInput">What are you looking for?</label>
+        <input
+          id="SearchInput"
+          type="search"
+          name="q"
+          value="{{ search.terms | escape }}"
+          placeholder="Search dresses, co-ords, t-shirts..."
+        >
+      </form>
+
+      {% if search.performed %}
+        {% if search.results_count > 0 %}
+          <div class="product-grid">
+            {% for item in search.results %}
+              {% if item.object_type == 'product' %}
+                {% assign product = item %}
+                <article class="product-card">
+                  <div class="product-label">Result</div>
+                  <a class="product-image" href="{{ product.url }}">
+                    {% if product.featured_image %}
+                      {{ product.featured_image | image_url: width: 700 | image_tag: alt: product.title }}
+                    {% endif %}
+                  </a>
+                  <div class="product-info">
+                    <a href="{{ product.url }}" class="product-name">{{ product.title }}</a>
+                    {% if product.description != blank %}
+                      <div class="product-meta">
+                        {{ product.description | strip_html | truncate: 90 }}
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="product-bottom">
+                    <div class="product-price">
+                      <span class="product-price-main">{{ product.price | money }}</span>
+                      {% if product.compare_at_price_max > product.price %}
+                        <span class="product-price-note">MRP {{ product.compare_at_price_max | money }}</span>
+                      {% else %}
+                        <span class="product-price-note">Inclusive of all taxes</span>
+                      {% endif %}
+                    </div>
+                    {% form 'product', product %}
+                      <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+                      <button type="submit" class="product-btn">
+                        Add to bag
+                      </button>
+                    {% endform %}
+                  </div>
+                </article>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <p style="color: var(--muted); font-size: 0.9rem;">
+            No results for “{{ search.terms }}”. Try another keyword.
+          </p>
+        {% endif %}
+      {% else %}
+        <p style="color: var(--muted); font-size: 0.9rem;">
+          Start typing above to search across products.
+        </p>
+      {% endif %}
+    </div>
+  </section>
+</main>
